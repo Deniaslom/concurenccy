@@ -54,12 +54,6 @@ class MyLinkedListImplTest {
     }
 
     @Test
-    public void checkListAfterClear() {
-        list.clear();
-        assertFalse(list.contains(STRING_0));
-    }
-
-    @Test
     public void checkAddAndContains() {
         list.add(STRING_6);
         assertTrue(list.contains(STRING_6));

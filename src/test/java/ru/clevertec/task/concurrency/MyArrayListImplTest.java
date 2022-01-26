@@ -70,12 +70,6 @@ class MyArrayListImplTest {
     }
 
     @Test
-    public void checkListAfterClear() {
-        list.clear();
-        assertFalse(list.contains(STRING_0));
-    }
-
-    @Test
     public void checkAddAndContains() {
         list.add("String 10");
         assertTrue(list.contains("String 10"));
