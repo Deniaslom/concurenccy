@@ -56,7 +56,7 @@ class MyLinkedListImplTest {
     @Test
     public void checkListAfterClear() {
         list.clear();
-        assertFalse(list.contains(STRING_0));
+        assertEquals(0, list.size());
     }
 
     @Test
