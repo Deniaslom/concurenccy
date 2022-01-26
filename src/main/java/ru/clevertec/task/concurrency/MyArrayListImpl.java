@@ -1,4 +1,4 @@
-package ru.clevertec.task.collection.customCollections;
+package ru.clevertec.task.concurrency;
 
 import java.util.*;
 import java.util.concurrent.locks.Lock;
@@ -11,7 +11,7 @@ import java.util.function.Consumer;
  *
  * @autor Denis Shpadaruk
  */
-public class CustomArrayList<E> implements List<E> {
+public class MyArrayListImpl<E> implements List<E> {
 
     /** default capacity */
     private static final int DEFAULT_CAPACITY = 5;
@@ -30,7 +30,7 @@ public class CustomArrayList<E> implements List<E> {
     /**
      * Constructor - creating a new object
      */
-    public CustomArrayList() {
+    public MyArrayListImpl() {
         this.massiveObjects = (E[]) new Object[DEFAULT_CAPACITY];
         size = 0;
     }
@@ -40,7 +40,7 @@ public class CustomArrayList<E> implements List<E> {
      *
      * @param initialCapacity - size massive
      */
-    public CustomArrayList(int initialCapacity) {
+    public MyArrayListImpl(int initialCapacity) {
         if (initialCapacity > 0) {
             this.massiveObjects = (E[]) new Object[initialCapacity];
             this.size = initialCapacity;

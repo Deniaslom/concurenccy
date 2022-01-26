@@ -1,20 +1,20 @@
-package ru.clevertec.task.collection.customCollections;
+package ru.clevertec.task.concurrency;
 
 /**
  * node class containing the object itself and a link to the next node
  * @autor Denis Shpadaruk
  */
-public class CustomNode<E> {
+public class Node<E> {
     private E data;
-    private CustomNode<E> next;
+    private Node<E> next;
 
-    public CustomNode() {
+    public Node() {
     }
 
     /**
      * Constructor which takes an int value which is stored as the data in this Node object.
      */
-    public CustomNode(E data) {
+    public Node(E data) {
         this.data = data;
     }
 
@@ -26,11 +26,11 @@ public class CustomNode<E> {
         this.data = data;
     }
 
-    public CustomNode getNext() {
+    public Node getNext() {
         return next;
     }
 
-    public void setNext(CustomNode next) {
+    public void setNext(Node next) {
         this.next = next;
     }
 }
