@@ -1,4 +1,4 @@
-package ru.clevertec.task.collection.customCollections;
+package ru.clevertec.task.concurrency;
 
 import java.util.*;
 import java.util.concurrent.locks.Lock;
@@ -10,20 +10,18 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *
  * @author Denis Shpadaruk
  */
-public class CustomLinkedList<E> implements List<E> {
+public class MyLinkedListImpl<E> implements List<E> {
 
     /** class wrapper to store an object */
-    private CustomNode<E> node;
+    private Node<E> node;
 
     /** declaring objects for synchronization */
     private final ReadWriteLock lock = new ReentrantReadWriteLock();
     private final Lock readLock = lock.readLock();
     private final Lock writeLock = lock.writeLock();
 
-    /**
-     * Constructor - creating a new object
-     */
-    public CustomLinkedList() {
+    /** Constructor - creating a new object */
+    public MyLinkedListImpl() {
     }
 
     /**
@@ -88,7 +86,7 @@ public class CustomLinkedList<E> implements List<E> {
                 return true;
 
             while (itr.hasNext()) {
-                CustomNode findNode = (CustomNode) itr.next();
+                Node findNode = (Node) itr.next();
                 if (findNode.getData().equals(o)) {
                     return true;
                 }
@@ -109,19 +107,19 @@ public class CustomLinkedList<E> implements List<E> {
         try {
             writeLock.lock();
             MyLinkedListIterator itr = new MyLinkedListIterator(node);
-            CustomNode targetNode = node;
+            Node targetNode = node;
 
             if (node == null) {
-                node = new CustomNode(e);
+                node = new Node(e);
                 return true;
             }
 
             while (itr.hasNext()) {
-                targetNode = (CustomNode) itr.next();
+                targetNode = (Node) itr.next();
             }
 
             if (targetNode.getNext() == null) {
-                targetNode.setNext(new CustomNode(e));
+                targetNode.setNext(new Node(e));
                 return true;
             }
 
@@ -139,16 +137,26 @@ public class CustomLinkedList<E> implements List<E> {
     public void add(int index, E element) {
         try {
             writeLock.lock();
+            Node oldNode = node;
+            Node targetNode = node;
+            Node newNode = new Node(element);
+            MyLinkedListIterator itr = new MyLinkedListIterator<>(node);
+
             if (index <= size() && index >= 0) {
-                int i = 0;
-                while (listIterator().hasNext() && index >= i) {
-                    i++;
-                    listIterator().next();
-                    if (index == i) {
-                        CustomNode oldNode = new CustomNode(node.getData());
-                        node.setData(element);
-                        node.setNext(oldNode);
+                for (int i = 0; itr.hasNext() && index >= i; i++) {
+                    if (index == 0 && index == i) {
+                        if (node != null) {
+                            newNode.setNext(node);
+                        }
+                        node = newNode;
                     }
+
+                    if (index != 0 && index == i) {
+                        oldNode.setNext(newNode);
+                        newNode.setNext(targetNode);
+                    }
+                    oldNode = targetNode;
+                    targetNode = (Node) itr.next();
                 }
             }
         } finally {
@@ -167,7 +175,7 @@ public class CustomLinkedList<E> implements List<E> {
             if (index == 0) {
                 node = node.getNext();
             } else {
-                CustomNode currentNode = node;
+                Node currentNode = node;
                 for (int i = 0; i < index - 1; i++) {
                     currentNode = currentNode.getNext();
                 }
@@ -213,13 +221,13 @@ public class CustomLinkedList<E> implements List<E> {
         try {
             readLock.lock();
             MyLinkedListIterator itr = new MyLinkedListIterator(node);
-            CustomNode targetNode = node;
+            Node targetNode = node;
             if (index >= 0 && index < size()) {
                 for (int i = 0; i <= index; i++) {
                     if (index == i) {
                         return (E) targetNode.getData();
                     }
-                    targetNode = (CustomNode) itr.next();
+                    targetNode = (Node) itr.next();
                 }
             }
             return (E) targetNode.getData();
@@ -240,14 +248,16 @@ public class CustomLinkedList<E> implements List<E> {
     public E set(int index, E element) {
         try {
             writeLock.lock();
+            MyLinkedListIterator itr = new MyLinkedListIterator(node);
+            Node targetNode = node;
             if (index <= size() && index >= 0) {
-                int i = 0;
-                while (listIterator().hasNext() && index >= i) {
-                    i++;
-                    listIterator().next();
+                for (int i = 0; index >= i; i++) {
                     if (index == i) {
-                        node.setData(element);
+                        targetNode.setData(element);
                     }
+
+                    if (itr.hasNext())
+                        targetNode = (Node) itr.next();
                 }
             }
             return (E) node.getData();
@@ -270,7 +280,7 @@ public class CustomLinkedList<E> implements List<E> {
             }
 
             while (itr.hasNext()) {
-                CustomNode next = (CustomNode) itr.next();
+                Node next = (Node) itr.next();
                 next.setData(null);
             }
         } finally {
@@ -289,7 +299,7 @@ public class CustomLinkedList<E> implements List<E> {
         try {
             readLock.lock();
             MyLinkedListIterator itr = new MyLinkedListIterator(node);
-            CustomNode findNode = node;
+            Node findNode = node;
             if (o == null)
                 throw new NullPointerException("object == null");
 
@@ -297,7 +307,7 @@ public class CustomLinkedList<E> implements List<E> {
                 if (findNode.getData().equals(o))
                     return index;
 
-                findNode = (CustomNode) itr.next();
+                findNode = (Node) itr.next();
             }
 
             return -1;
@@ -318,7 +328,7 @@ public class CustomLinkedList<E> implements List<E> {
             readLock.lock();
 
             MyLinkedListIterator itr = new MyLinkedListIterator(node);
-            CustomNode findNode = node;
+            Node findNode = node;
             int lastIndex = -1;
             if (o == null)
                 throw new NullPointerException("object == null");
@@ -327,7 +337,7 @@ public class CustomLinkedList<E> implements List<E> {
                 if (findNode.getData().equals(o))
                     lastIndex = index;
 
-                findNode = (CustomNode) itr.next();
+                findNode = (Node) itr.next();
             }
 
             return lastIndex;
@@ -379,9 +389,9 @@ public class CustomLinkedList<E> implements List<E> {
 
 
     private class MyLinkedListIterator<E> implements Iterator<E> {
-        private CustomNode<E> targetNode;
+        private Node<E> targetNode;
 
-        public MyLinkedListIterator(CustomNode node) {
+        public MyLinkedListIterator(Node node) {
             this.targetNode = node;
         }
 
