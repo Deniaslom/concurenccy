@@ -1,0 +1,1 @@
+my custom thread-safe collection
